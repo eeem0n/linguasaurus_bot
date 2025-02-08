@@ -1,9 +1,8 @@
 from telegram import Update
-from telegram.ext import MessageHandler, filters, CommandHandler, CallbackContext, CallbackQueryHandler
-from file_manager import detect_file, upload, delete_file
-from database import search_files, get_files_by_category
-from config import ADMIN_IDS
-from keyboards import semester_menu, back_button
+from telegram.ext import CallbackContext, CommandHandler, CallbackQueryHandler
+from keyboards import semester_menu, back_button  
+from database import get_files_by_category, search_files
+from file_manager import upload, delete
 
 
 # Start Command
@@ -55,7 +54,7 @@ async def handle_back(update: Update, context: CallbackContext):
     category = query.message.text.split(" ")[1].lower()  # Extract category from message
     await query.edit_message_text(f"📂 Select a semester for {category.capitalize()}:", reply_markup=semester_menu(category))
 
-# ✅ Set Up Handlers (Fixed `delete_file`)
+#  Set Up Handlers
 def setup_handlers(app):
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
@@ -66,7 +65,6 @@ def setup_handlers(app):
     app.add_handler(CommandHandler("routine", show_semester_menu))
     app.add_handler(CommandHandler("search", search))
     app.add_handler(CommandHandler("upload", upload))
-    app.add_handler(CommandHandler("delete", delete_file))  # ✅ Fixed NameError
+    app.add_handler(CommandHandler("delete", delete))
     app.add_handler(CallbackQueryHandler(handle_semester_selection, pattern=".*_semester_"))
     app.add_handler(CallbackQueryHandler(handle_back, pattern="go_back"))  # Handle back button
-    app.add_handler(MessageHandler(filters.Document.ALL, detect_file))
