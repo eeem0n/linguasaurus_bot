@@ -24,7 +24,6 @@ async def upload(update: Update, context: CallbackContext):
         await update.message.reply_text("❌ Only admins can upload files.")
         return
 
-    # ✅ Check if a file was uploaded before this command
     if user_id not in pending_files:
         await update.message.reply_text("❌ No file detected.\nPlease send a file first, then use `/upload`.")
         return
@@ -35,15 +34,24 @@ async def upload(update: Update, context: CallbackContext):
 
     category = context.args[0]
     semester = context.args[1]
-    keywords = " ".join(context.args[2:])  # Store keywords
+    keywords = " ".join(context.args[2:])
 
-    file_id = pending_files[user_id]["file_id"]
-    file_name = pending_files[user_id]["file_name"]
+    file_data = pending_files.pop(user_id, None)
+    if not file_data:
+        await update.message.reply_text("❌ No pending file found. Please send the file again.")
+        return
 
-    save_file(file_id, file_name, category, semester, keywords)
-    del pending_files[user_id]  # ✅ Remove from pending list after saving
+    file_id = file_data["file_id"]
+    file_name = file_data["file_name"]
 
-    await update.message.reply_text(f"✅ File '{file_name}' saved under {category.capitalize()}, Semester {semester}.\n📌 Keywords: {keywords}")
+    # ✅ Try to save the file
+    success = save_file(file_id, file_name, category, semester, keywords)
+
+    if success:
+        await update.message.reply_text(f"✅ File '{file_name}' saved under {category.capitalize()}, Semester {semester}.\n📌 Keywords: {keywords}")
+    else:
+        await update.message.reply_text(f"⚠️ File '{file_name}' already exists in the database.")
+
 
 # Delete file (Admins only)
 async def delete(update: Update, context: CallbackContext):
