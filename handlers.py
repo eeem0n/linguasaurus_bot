@@ -1,5 +1,5 @@
 from telegram.ext import MessageHandler, filters, CommandHandler
-from file_manager import detect_file, upload, download
+from file_manager import detect_file, upload
 from database import search_files
 from config import ADMIN_IDS
 
