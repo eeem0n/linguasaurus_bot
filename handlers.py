@@ -5,6 +5,7 @@ from database import search_files, get_files_by_category
 from config import ADMIN_IDS
 from keyboards import semester_menu, back_button
 
+
 # Start Command
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("📚 Welcome to Linguasaurus, your go-to assistant for your journey with Linguistics! Use /help to see commands.")
@@ -54,7 +55,7 @@ async def handle_back(update: Update, context: CallbackContext):
     category = query.message.text.split(" ")[1].lower()  # Extract category from message
     await query.edit_message_text(f"📂 Select a semester for {category.capitalize()}:", reply_markup=semester_menu(category))
 
-#  Set Up Handlers
+# ✅ Set Up Handlers (Fixed `delete_file`)
 def setup_handlers(app):
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
@@ -65,7 +66,7 @@ def setup_handlers(app):
     app.add_handler(CommandHandler("routine", show_semester_menu))
     app.add_handler(CommandHandler("search", search))
     app.add_handler(CommandHandler("upload", upload))
-    app.add_handler(CommandHandler("delete", delete))
+    app.add_handler(CommandHandler("delete", delete_file))  # ✅ Fixed NameError
     app.add_handler(CallbackQueryHandler(handle_semester_selection, pattern=".*_semester_"))
     app.add_handler(CallbackQueryHandler(handle_back, pattern="go_back"))  # Handle back button
     app.add_handler(MessageHandler(filters.Document.ALL, detect_file))
