@@ -45,3 +45,4 @@ def delete_file(file_name):
 def test_database():
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='files'")
     return cursor.fetchone() is not None
+
