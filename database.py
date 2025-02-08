@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS files (
     file_id TEXT UNIQUE,
     file_name TEXT,
     category TEXT,
-    semester INTEGER
+    semester INTEGER,
+    keywords TEXT
 )
 """)
 conn.commit()
@@ -24,12 +25,17 @@ def get_files_by_category(category):
     return [row[0] for row in cursor.fetchall()]
 
 
-# Save file with keywords
+# save
 def save_file(file_id, file_name, category, semester, keywords):
     full_category = f"{category}_semester_{semester}"
-    cursor.execute("INSERT INTO files (file_id, file_name, category, semester, keywords) VALUES (?, ?, ?, ?, ?)", 
-                   (file_id, file_name, full_category, semester, keywords))
-    conn.commit()
+    try:
+        cursor.execute("INSERT INTO files (file_id, file_name, category, semester, keywords) VALUES (?, ?, ?, ?, ?)", 
+                       (file_id, file_name, full_category, semester, keywords))
+        conn.commit()
+        return True  # ✅ File saved successfully
+    except sqlite3.IntegrityError:
+        return False  # ❌ File already exists
+
 
 # Search files by keyword
 def search_files(keyword):
