@@ -1,8 +1,7 @@
-from telegram import Update
-from telegram.ext import CallbackContext, CommandHandler, CallbackQueryHandler
-from keyboards import semester_menu, back_button  
-from database import get_files_by_category, search_files
-from file_manager import upload, delete
+from telegram.ext import MessageHandler, filters, CommandHandler
+from file_manager import detect_file, upload, download
+from database import search_files
+from config import ADMIN_IDS
 
 
 # Start Command
@@ -68,3 +67,4 @@ def setup_handlers(app):
     app.add_handler(CommandHandler("delete", delete))
     app.add_handler(CallbackQueryHandler(handle_semester_selection, pattern=".*_semester_"))
     app.add_handler(CallbackQueryHandler(handle_back, pattern="go_back"))  # Handle back button
+    app.add_handler(MessageHandler(filters.Document.ALL, detect_file))
