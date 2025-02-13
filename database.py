@@ -1,11 +1,11 @@
 import psycopg2
 from config import DATABASE_URL
 
-# Connect to PostgreSQL
+# connect to PostgreSQL
 conn = psycopg2.connect(DATABASE_URL)
 cursor = conn.cursor()
 
-# ✅ Create table if not exists
+# create table if not exists
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS files (
     id SERIAL PRIMARY KEY,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS files (
 """)
 conn.commit()
 
-# ✅ Save file metadata
+# cave file metadata
 def save_file(file_id, file_name, category, course_code, keywords):
     try:
         cursor.execute("""
@@ -30,12 +30,12 @@ def save_file(file_id, file_name, category, course_code, keywords):
     except psycopg2.IntegrityError:
         return False
 
-# ✅ Get files by category & course code
+# get files by category & course code
 def get_files_by_course(category, course_code):
     cursor.execute("SELECT file_name, file_id FROM files WHERE category=%s AND course_code=%s", (category, course_code))
     return cursor.fetchall()
 
-# ✅ Get all files by course, grouped by category
+# get all files by course, grouped by category
 def get_all_files_by_course(course_code):
     cursor.execute("SELECT category, file_name, file_id FROM files WHERE course_code=%s ORDER BY category", (course_code,))
     files = cursor.fetchall()
@@ -49,7 +49,7 @@ def get_all_files_by_course(course_code):
 
     return categorized_files
 
-# ✅ Search files by keyword
+# search files by keyword
 def search_files(keyword):
     cursor.execute("SELECT file_name, file_id FROM files WHERE keywords ILIKE %s OR file_name ILIKE %s",
                    (f"%{keyword}%", f"%{keyword}%"))
