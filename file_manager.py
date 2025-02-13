@@ -3,88 +3,86 @@ from telegram.ext import CallbackContext
 from database import save_file, delete_file
 from config import ADMIN_IDS
 
-# ✅ Allowed categories
+# allowed categories
 ALLOWED_CATEGORIES = ["books", "notes", "questions", "syllabus", "routine"]
 
-# ✅ Temporary storage for uploaded files
+# temporary storage for uploaded files
 pending_files = {}
 
-# ✅ Detect file upload
+# detect file upload
 async def detect_file(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     if user_id not in ADMIN_IDS:
-        return  # Ignore non-admins
+        return  # ignore non-admins
 
     if update.message.document:
         file = update.message.document
         pending_files[user_id] = {"file_id": file.file_id, "file_name": file.file_name}
         await update.message.reply_text(
-            "📂 File received! Now enter: `/upload <category> <course_code> <keywords>`\n"
-            "Example: `/upload books 1101 linguistics, syntax`"
+            "📂 file received! now enter: /upload <category> <course_code> <keywords>\n"
         )
 
-# ✅ Upload file to database
+# upload file to database
 async def upload(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     if user_id not in ADMIN_IDS:
-        await update.message.reply_text("❌ Only admins can upload files.")
+        await update.message.reply_text("❌ only admins can upload files.")
         return
 
     if user_id not in pending_files:
-        await update.message.reply_text("❌ No file detected. Please send a file first, then use `/upload`.")
+        await update.message.reply_text("❌ no file detected. please send a file first, then use /upload.")
         return
 
     if len(context.args) < 3:
         await update.message.reply_text(
-            "❌ Usage: `/upload <category> <course_code> <keywords>`\n"
-            "Example: `/upload books 1101 linguistics, syntax`"
+            "❌ usage: /upload <category> <course_code> <keywords>\n"
         )
         return
 
-    category = context.args[0].lower()  # Convert to lowercase
+    category = context.args[0].lower()  # convert to lowercase
     course_code = context.args[1]
     keywords = " ".join(context.args[2:])
 
-    # ✅ Validate category
+    # validate category
     if category not in ALLOWED_CATEGORIES:
         await update.message.reply_text(
-            "❌ Invalid category! Choose from:\n"
-            "`books`, `notes`, `questions`, `syllabus`, `routine`"
+            "❌ invalid category! choose from:\n"
+            "books, notes, questions, syllabus, routine"
         )
         return
 
     file_data = pending_files.pop(user_id, None)
     if not file_data:
-        await update.message.reply_text("❌ No pending file found. Please send the file again.")
+        await update.message.reply_text("❌ no pending file found. please send the file again.")
         return
 
     file_id = file_data["file_id"]
     file_name = file_data["file_name"]
 
-    # ✅ Save to database
+    # save to database
     success = save_file(file_id, file_name, category, course_code, keywords)
 
     if success:
         await update.message.reply_text(
-            f"✅ File '{file_name}' saved under **{category.capitalize()}** for course **{course_code}**.\n"
-            f"📌 Keywords: `{keywords}`"
+            f"✅ file '{file_name}' saved under **{category.capitalize()}** for course **{course_code}**.\n"
+            f"📌 keywords: {keywords}"
         )
     else:
-        await update.message.reply_text(f"⚠️ File '{file_name}' already exists in the database.")
+        await update.message.reply_text(f"⚠️ file '{file_name}' already exists in the database.")
 
-# ✅ Delete a file (Admin-only)
+# delete a file (admin-only)
 async def delete(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     if user_id not in ADMIN_IDS:
-        await update.message.reply_text("❌ Only admins can delete files.")
+        await update.message.reply_text("❌ only admins can delete files.")
         return
 
     if len(context.args) < 1:
-        await update.message.reply_text("❌ Usage: `/delete <file_name>`")
+        await update.message.reply_text("❌ usage: /delete <file_name>")
         return
 
     file_name = " ".join(context.args)
     delete_file(file_name)
-    await update.message.reply_text(f"✅ File '{file_name}' deleted.")
+    await update.message.reply_text(f"✅ file '{file_name}' deleted.")
 
 
