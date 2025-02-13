@@ -1,71 +1,65 @@
-from telegram import Update
-from telegram.ext import CallbackContext, CommandHandler, CallbackQueryHandler, MessageHandler, filters
-from keyboards import semester_menu, back_button  
-from database import get_files_by_category, search_files
+from telegram.ext import CommandHandler, MessageHandler, filters
 from file_manager import detect_file, upload, delete
+from database import search_files, get_files_by_course
 
+#  Start Command
+async def start(update, context):
+    await update.message.reply_text("📚 Welcome to Linguasaurus! Use /help to see all available commands.")
 
-# Start Command
-async def start(update: Update, context: CallbackContext):
-    await update.message.reply_text("📚 Welcome to Linguasaurus, your go-to assistant for your journey with Linguistics! Use /help to see commands.")
-
-# Help Command
-async def help_command(update: Update, context: CallbackContext):
+#  Help Command
+async def help_command(update, context):
     await update.message.reply_text(
-        "You can control me by sending these commands:\n"
-        "\n"
-        "/books - browse books \n"
-        "/notes - browse notes \n"
-        "/questions - browse past questions \n"
-        "/syllabus - view syllabus \n"
-        "/routine - view schedule \n"
-        "/search <keyword> - search materials \n"
+        "/books <course_code> - view books for a course\n"
+        "/notes <course_code> - view notes for a course\n"
+        "/questions <course_code> - view past questions\n"
+        "/syllabus <course_code> - view syllabus\n"
+        "/routine <course_code> - view routine\n"
+        "/search <keyword> - search materials\n"
     )
 
-# Show semester selection
-async def show_semester_menu(update: Update, context: CallbackContext):
-    category = update.message.text.replace("/", "")  # Extract category from command
-    await update.message.reply_text(f"📂 Select a semester for {category.capitalize()}:", reply_markup=semester_menu(category))
+#  Retrieve files by category and course code
+async def list_files(update, context):
+    if len(context.args) < 1:
+        await update.message.reply_text("❌ Usage: /books <course_code>")
+        return
 
-# Handle semester selection
-async def handle_semester_selection(update: Update, context: CallbackContext):
-    query = update.callback_query
-    await query.answer()
-    category, semester = query.data.split("_semester_")
-    files = get_files_by_category(f"{category}_semester_{semester}")
-    
-    message = "📂 " + category.capitalize() + " for Semester " + semester + ":\n"
-    message += "\n".join(files) if files else "❌ No files found."
-    
-    # Show files with a "Back" button
-    await query.edit_message_text(message, reply_markup=back_button())
+    category = update.message.text.split(" ")[0][1:]  # Extract category from command
+    course_code = context.args[0]
+    files = get_files_by_course(category, course_code)
 
-# Search function
-async def search(update: Update, context: CallbackContext):
-    query = " ".join(context.args)
-    results = search_files(query)
-    await update.message.reply_text("🔍 Search Results:\n" + "\n".join(results) if results else "❌ No matches found.")
+    if not files:
+        await update.message.reply_text("❌ No files found.")
+        return
 
+    for file_name, file_id in files:
+        await update.message.reply_document(file_id, caption=f"📄 {file_name}")
 
-# Handle back button (returns to semester selection)
-async def handle_back(update: Update, context: CallbackContext):
-    query = update.callback_query
-    await query.answer()
-    category = query.message.text.split(" ")[1].lower()  # Extract category from message
-    await query.edit_message_text(f"📂 Select a semester for {category.capitalize()}:", reply_markup=semester_menu(category))
+#  Search files by keyword
+async def search(update, context):
+    if len(context.args) < 1:
+        await update.message.reply_text("❌ Usage: /search <keyword>")
+        return
 
-#  Set Up Handlers
+    keyword = " ".join(context.args)
+    results = search_files(keyword)
+
+    if not results:
+        await update.message.reply_text("❌ No matches found.")
+        return
+
+    for file_name, file_id in results:
+        await update.message.reply_document(file_id, caption=f"📄 {file_name}")
+
+#  Set up bot commands
 def setup_handlers(app):
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("books", show_semester_menu))
-    app.add_handler(CommandHandler("notes", show_semester_menu))
-    app.add_handler(CommandHandler("questions", show_semester_menu))
-    app.add_handler(CommandHandler("syllabus", show_semester_menu))
-    app.add_handler(CommandHandler("routine", show_semester_menu))
-    app.add_handler(CommandHandler("search", search))
     app.add_handler(CommandHandler("upload", upload))
+    app.add_handler(CommandHandler("books", list_files))
+    app.add_handler(CommandHandler("notes", list_files))
+    app.add_handler(CommandHandler("questions", list_files))
+    app.add_handler(CommandHandler("syllabus", list_files))
+    app.add_handler(CommandHandler("routine", list_files))
     app.add_handler(CommandHandler("delete", delete))
-    app.add_handler(CallbackQueryHandler(handle_semester_selection, pattern=".*_semester_"))
-    app.add_handler(CallbackQueryHandler(handle_back, pattern="go_back"))  # Handle back button
-    app.add_handler(MessageHandler(filters.Document.ALL, detect_file))  # ✅ Detects file uploads
+    app.add_handler(CommandHandler("search", search))
+    app.add_handler(MessageHandler(filters.Document.ALL, detect_file))
