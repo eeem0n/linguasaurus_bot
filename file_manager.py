@@ -1,7 +1,10 @@
 from telegram import Update
 from telegram.ext import CallbackContext
-from database import save_file, delete_file, get_files_by_course
+from database import save_file, delete_file
 from config import ADMIN_IDS
+
+# ✅ Allowed categories
+ALLOWED_CATEGORIES = ["books", "notes", "questions", "syllabus", "routine"]
 
 # ✅ Temporary storage for uploaded files
 pending_files = {}
@@ -15,7 +18,10 @@ async def detect_file(update: Update, context: CallbackContext):
     if update.message.document:
         file = update.message.document
         pending_files[user_id] = {"file_id": file.file_id, "file_name": file.file_name}
-        await update.message.reply_text("📂 File received! Now enter: /upload <course_code> <keywords>")
+        await update.message.reply_text(
+            "📂 File received! Now enter: `/upload <category> <course_code> <keywords>`\n"
+            "Example: `/upload books 1101 linguistics, syntax`"
+        )
 
 # ✅ Upload file to database
 async def upload(update: Update, context: CallbackContext):
@@ -25,15 +31,27 @@ async def upload(update: Update, context: CallbackContext):
         return
 
     if user_id not in pending_files:
-        await update.message.reply_text("❌ No file detected. Please send a file first, then use /upload.")
+        await update.message.reply_text("❌ No file detected. Please send a file first, then use `/upload`.")
         return
 
-    if len(context.args) < 2:
-        await update.message.reply_text("❌ Usage: /upload <course_code> <keywords>")
+    if len(context.args) < 3:
+        await update.message.reply_text(
+            "❌ Usage: `/upload <category> <course_code> <keywords>`\n"
+            "Example: `/upload books 1101 linguistics, syntax`"
+        )
         return
 
-    course_code = context.args[0]
-    keywords = " ".join(context.args[1:])
+    category = context.args[0].lower()  # Convert to lowercase
+    course_code = context.args[1]
+    keywords = " ".join(context.args[2:])
+
+    # ✅ Validate category
+    if category not in ALLOWED_CATEGORIES:
+        await update.message.reply_text(
+            "❌ Invalid category! Choose from:\n"
+            "`books`, `notes`, `questions`, `syllabus`, `routine`"
+        )
+        return
 
     file_data = pending_files.pop(user_id, None)
     if not file_data:
@@ -44,29 +62,15 @@ async def upload(update: Update, context: CallbackContext):
     file_name = file_data["file_name"]
 
     # ✅ Save to database
-    success = save_file(file_id, file_name, course_code, keywords)
+    success = save_file(file_id, file_name, category, course_code, keywords)
 
     if success:
-        await update.message.reply_text(f"✅ File '{file_name}' saved under course {course_code}.\n📌 Keywords: {keywords}")
+        await update.message.reply_text(
+            f"✅ File '{file_name}' saved under **{category.capitalize()}** for course **{course_code}**.\n"
+            f"📌 Keywords: `{keywords}`"
+        )
     else:
         await update.message.reply_text(f"⚠️ File '{file_name}' already exists in the database.")
-
-# ✅ List available files for a course
-async def list_files(update: Update, context: CallbackContext):
-    if len(context.args) < 1:
-        await update.message.reply_text("❌ Usage: /books <course_code>")
-        return
-
-    course_code = context.args[0]
-    files = get_files_by_course(course_code)
-
-    if not files:
-        await update.message.reply_text("❌ No files found.")
-        return
-
-    chat_id = update.message.chat_id
-    for file_name, file_id in files:
-        await context.bot.send_document(chat_id, file_id, caption=f"📄 {file_name}")
 
 # ✅ Delete a file (Admin-only)
 async def delete(update: Update, context: CallbackContext):
@@ -76,10 +80,11 @@ async def delete(update: Update, context: CallbackContext):
         return
 
     if len(context.args) < 1:
-        await update.message.reply_text("❌ Usage: /delete <file_name>")
+        await update.message.reply_text("❌ Usage: `/delete <file_name>`")
         return
 
     file_name = " ".join(context.args)
     delete_file(file_name)
     await update.message.reply_text(f"✅ File '{file_name}' deleted.")
+
 
