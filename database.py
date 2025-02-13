@@ -55,7 +55,7 @@ def search_files(keyword):
                    (f"%{keyword}%", f"%{keyword}%"))
     return cursor.fetchall()
 
-# ✅ Delete a file
+# delete a file
 def delete_file(file_name):
     cursor.execute("DELETE FROM files WHERE file_name=%s", (file_name,))
     conn.commit()
