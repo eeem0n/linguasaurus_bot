@@ -4,7 +4,7 @@ from database import save_file, delete_file
 from config import ADMIN_IDS
 
 # allowed categories
-ALLOWED_CATEGORIES = ["books", "notes", "questions", "syllabus", "routine"]
+ALLOWED_CATEGORIES = ["books", "notes", "questions", "syllabus"]
 
 # temporary storage for uploaded files
 pending_files = {}
@@ -47,7 +47,7 @@ async def upload(update: Update, context: CallbackContext):
     if category not in ALLOWED_CATEGORIES:
         await update.message.reply_text(
             "❌ invalid category! choose from:\n"
-            "books, notes, questions, syllabus, routine"
+            "books, notes, questions, syllabus"
         )
         return
 
