@@ -1,6 +1,6 @@
 # Linguasaurus Bot
 
-Linguasaurus Bot is a Telegram bot designed to assist students in the Department of Linguistics of Dhaka University. It provides an easy way to store, retrieve, and manage resources, including PDFs, slides and other data through simple commands.
+Linguasaurus Bot is a Telegram bot designed to assist students in the Department of Linguistics, Dhaka University. It provides an easy way to store, retrieve, and manage resources, including PDFs, slides and other data through simple commands.
 
 ---
 
