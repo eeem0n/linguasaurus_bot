@@ -9,5 +9,5 @@ setup_handlers(app)
 
 app.add_error_handler(log_error)
 
-print("🤖 gg bro, Linguasaurus is running...")
+print("🤖 gg bro! Linguasaurus is running...")
 app.run_polling()
