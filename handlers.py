@@ -6,21 +6,25 @@ from database import search_files, get_files_by_course, get_all_files_by_course
 async def start(update, context):
     await update.message.reply_text("📚 Welcome to Linguasaurus, your go-to assistant for your journey in Linguistics! Use /help to see all available commands.")
 
-# help Command
+# help command
 async def help_command(update, context):
-    await update.message.reply_text(
+    image_path = "assets/coursecatalogue.png" 
+    help_text = (
         "/books <course_code>\n"
         "/notes <course_code>\n"
         "/questions <course_code>\n"
         "/syllabus <course_code>\n"
         "/search <keyword>\n"
     )
+    with open(image_path, "rb") as image_file:
+        await update.message.reply_photo(photo=image_file, caption=help_text)
+
 
 # retrieve files by category and course code
 async def list_files(update, context):
     if len(context.args) < 1:
         category = update.message.text.split(" ")[0][1:]
-        await update.message.reply_text("❌ usage: /{category} <course_code>\n" "example: /books 1101 \n")
+        await update.message.reply_text("❌ usage: /{category} <course_code>\n" "✅ example: /books 1101 \n")
         return
 
     category = update.message.text.split(" ")[0][1:]  # extract category from command
