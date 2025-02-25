@@ -10,13 +10,13 @@ async def start(update, context):
 async def help_command(update, context):
     image_path = "assets/coursecatalogue.png" 
     help_text = (
-        "*here's the course catalogue ⬆️*\n\n"
-        "*Retrieve files using these commands:*\n"
+        "*here's the course catalogue ⬆️*\n\n\n"
+        "*retrieve files using these commands:*\n\n"
         "/books <course_code>\n"
         "/notes <course_code>\n"
         "/questions <course_code>\n"
         "/syllabus <course_code>\n\n"
-        "*Search files by keyword:*\n"
+        "*search files by keyword:*\n\n"
         "/search <keyword>\n"
     )
     with open(image_path, "rb") as image_file:
