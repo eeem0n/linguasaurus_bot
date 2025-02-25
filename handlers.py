@@ -10,20 +10,18 @@ async def start(update, context):
 async def help_command(update, context):
     png_path = "assets/coursecatalogue-1.png" 
     help_text = (
-        "/*here's the course catalougue* ⬆️\n"
-
-        "/*retrieve files using these commands:*\n"
+        "*Here's the course catalogue* ⬆️\n\n"
+        "*Retrieve files using these commands:*\n"
         "/books <course_code>\n"
         "/notes <course_code>\n"
         "/questions <course_code>\n"
-        "/syllabus <course_code>\n"
-
-        
-        "/*search files*"
+        "/syllabus <course_code>\n\n"
+        "*Search files by keyword:*\n"
         "/search <keyword>\n"
     )
     with open(png_path, "rb") as png_file:
         await update.message.reply_document(document=png_file, caption=help_text, parse_mode='Markdown')
+
 
 
 # retrieve files by category and course code
