@@ -8,7 +8,7 @@ async def start(update, context):
 
 # help command
 async def help_command(update, context):
-    image_path = "assets/coursecatalog.png"
+    pdf_path = "assets/coursecatalog.pdf"
     help_text = (
         "*here's the course catalogue ⬆️*\n\n\n"
         "*retrieve files using these commands:*\n\n"
@@ -19,14 +19,14 @@ async def help_command(update, context):
         "*search files by keyword:*\n\n"
         "/search <keyword>\n"
     )
-
-    try:
-        with open(image_path, "rb") as image_file:
-            await update.message.reply_photo(photo=image_file, caption=help_text, parse_mode='Markdown')
+try:
+        with open(pdf_path, "rb") as pdf_file:
+            await update.message.reply_document(document=pdf_file, caption=help_text, parse_mode='Markdown')
+            
     except FileNotFoundError:
-        await update.message.reply_text("❌ Could not find the course catalogue image. Please check the file path.")
+        await update.message.reply_text("❌ could not find the course catalogue document. please check the file path.")
     except Exception as e:
-        await update.message.reply_text(f"❌ An error occurred: {str(e)}")
+        await update.message.reply_text(f"❌ an error occurred: {str(e)}")
 
 # retrieve files by category and course code
 async def list_files(update, context):
