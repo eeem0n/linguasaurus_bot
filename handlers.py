@@ -10,24 +10,24 @@ async def start(update, context):
 async def help_command(update, context):
     pdf_path = "assets/coursecatalog.pdf"
     help_text = (
-        "*here's the course catalogue  ⬆️*\n\n"
-        "*retrieve files using these commands:*\n"
+        "*Here's the Course Catalogue*\n\n"
+        "*Commands*\n"
         "/books \<course_code\>\n"
         "/notes \<course_code\>\n"
         "/questions \<course_code\>\n"
         "/syllabus \<course_code\>\n\n"
-        "*search files by keyword:*\n"
+        "*Search*\n"
         "/search <keyword>\n"
     )
-try:
+
+    try:
         with open(pdf_path, "rb") as pdf_file:
             await update.message.reply_document(document=pdf_file, caption=help_text, parse_mode='Markdown')
             
     except FileNotFoundError:
-        await update.message.reply_text("❌ could not find the course catalogue document. please check the file path.")
+        await update.message.reply_text("❌ Could not find the course catalogue document. Please check the file path.")
     except Exception as e:
-        await update.message.reply_text(f"❌ an error occurred: {str(e)}")
-
+        await update.message.reply_text(f"❌ An error occurred: {str(e)}")
 # retrieve files by category and course code
 async def list_files(update, context):
     if len(context.args) < 1:
