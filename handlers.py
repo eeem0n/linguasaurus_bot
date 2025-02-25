@@ -19,8 +19,13 @@ async def help_command(update, context):
         "*Search files by keyword:*\n"
         "/search <keyword>\n"
     )
+    
+    # Send the help text first with Markdown formatting
+    await update.message.reply_text(help_text, parse_mode='Markdown')
+    
+    # Send the image separately
     with open(png_path, "rb") as png_file:
-        await update.message.reply_document(document=png_file, caption=help_text, parse_mode='Markdown')
+        await update.message.reply_document(document=png_file)
 
 
 
