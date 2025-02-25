@@ -10,13 +10,13 @@ async def start(update, context):
 async def help_command(update, context):
     pdf_path = "assets/coursecatalog.pdf"
     help_text = (
-        "*here's the course catalogue ⬆️*\n\n\n"
-        "*retrieve files using these commands:*\n\n"
-        "/books <course_code>\n"
-        "/notes <course_code>\n"
-        "/questions <course_code>\n"
-        "/syllabus <course_code>\n\n"
-        "*search files by keyword:*\n\n"
+        "*here's the course catalogue  ⬆️*\n\n"
+        "*retrieve files using these commands:*\n"
+        "/books \<course_code\>\n"
+        "/notes \<course_code\>\n"
+        "/questions \<course_code\>\n"
+        "/syllabus \<course_code\>\n\n"
+        "*search files by keyword:*\n"
         "/search <keyword>\n"
     )
 try:
