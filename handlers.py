@@ -8,7 +8,7 @@ async def start(update, context):
 
 # help command
 async def help_command(update, context):
-    image_path = "assets/coursecatalogue.png"
+    image_path = "assets/coursecatalog.png"
     help_text = (
         "*here's the course catalogue ⬆️*\n\n\n"
         "*retrieve files using these commands:*\n\n"
