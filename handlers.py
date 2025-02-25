@@ -8,16 +8,22 @@ async def start(update, context):
 
 # help command
 async def help_command(update, context):
-    pdf_path = "assets/coursecatalogue.pdf" 
+    png_path = "assets/coursecatalogue-1.png" 
     help_text = (
+        "/*here's the course catalougue* ⬆️\n"
+
+        "/*retrieve files using these commands:*\n"
         "/books <course_code>\n"
         "/notes <course_code>\n"
         "/questions <course_code>\n"
         "/syllabus <course_code>\n"
+
+        
+        "/*search files*"
         "/search <keyword>\n"
     )
-    with open(pdf_path, "rb") as pdf_file:
-        await update.message.reply_document(document=pdf_file, caption=help_text)
+    with open(png_path, "rb") as png_file:
+        await update.message.reply_document(document=png_file, caption=help_text, parse_mode='Markdown')
 
 
 # retrieve files by category and course code
