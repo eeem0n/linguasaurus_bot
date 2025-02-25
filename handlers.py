@@ -8,9 +8,9 @@ async def start(update, context):
 
 # help command
 async def help_command(update, context):
-    image_path = "assets/coursecatalogue-1.png" 
+    image_path = "assets/coursecatalogue.png" 
     help_text = (
-        "*Here's the course catalogue* ⬆️\n\n"
+        "*here's the course catalogue ⬆️*\n\n"
         "*Retrieve files using these commands:*\n"
         "/books <course_code>\n"
         "/notes <course_code>\n"
@@ -20,7 +20,7 @@ async def help_command(update, context):
         "/search <keyword>\n"
     )
     with open(image_path, "rb") as image_file:
-        await update.message.reply_photo(photo=image_file, caption=help_text, parse_mode='Markdown')
+        await update.message.reply_photo(photo=image_file, caption=help_text)
 
 
 # retrieve files by category and course code
