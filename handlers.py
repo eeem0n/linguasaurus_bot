@@ -1,5 +1,4 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CommandHandler, MessageHandler, filters, CallbackQueryHandler
+from telegram.ext import CommandHandler, MessageHandler, filters
 from file_manager import detect_file, upload, delete
 from database import search_files, get_files_by_course, get_all_files_by_course
 
@@ -32,7 +31,7 @@ async def help_command(update, context):
 async def list_files(update, context):
     if len(context.args) < 1:
         category = update.message.text.split(" ")[0][1:]
-        await update.message.reply_text(f"❌ usage: /{category} <course_code>\n✅ example: /books 1101\n")
+        await update.message.reply_text("❌ usage: /{category} <course_code>\n" "✅ example: /books 1101 \n")
         return
 
     category = update.message.text.split(" ")[0][1:]  # extract category from command
@@ -43,34 +42,10 @@ async def list_files(update, context):
         await update.message.reply_text(f"❌ no {category} found for course {course_code}.")
         return
 
-    buttons = []
     for file_name, file_id in files:
-        buttons.append([InlineKeyboardButton(file_name, callback_data=f"{category}:{file_id}")])
-    
-    # Add a "Get All" button
-    buttons.append([InlineKeyboardButton("Get All", callback_data=f"{category}:all:{course_code}")])
-    
-    reply_markup = InlineKeyboardMarkup(buttons)
-    await update.message.reply_text(f"Select a file to download for course {course_code}:", reply_markup=reply_markup)
+        await update.message.reply_document(file_id, caption=f"📄 {file_name}")
 
-# handle file selection
-async def file_selection(update, context):
-    query = update.callback_query
-    await query.answer()
-    
-    data = query.data.split(":")
-    category = data[0]
-    file_id = data[1]
-    
-    if file_id == "all":
-        course_code = data[2]
-        files = get_files_by_course(category, course_code)
-        for file_name, file_id in files:
-            await query.message.reply_document(file_id, caption=f"📄 {file_name}")
-    else:
-        # Get the file name from the file_id if needed
-        file_name = "Selected File"  # Replace with the actual file name if needed
-        await query.message.reply_document(file_id, caption=f"📄 {file_name}")
+
 
 # search files by keyword
 async def search(update, context):
@@ -85,34 +60,8 @@ async def search(update, context):
         await update.message.reply_text("❌ no matches found.")
         return
 
-    buttons = []
     for file_name, file_id in results:
-        buttons.append([InlineKeyboardButton(file_name, callback_data=f"search:{file_id}")])
-    
-    # Add a "Get All" button
-    buttons.append([InlineKeyboardButton("Get All", callback_data=f"search:all:{keyword}")])
-    
-    reply_markup = InlineKeyboardMarkup(buttons)
-    await update.message.reply_text("Select a file to download:", reply_markup=reply_markup)
-
-# handle search selection
-async def search_selection(update, context):
-    query = update.callback_query
-    await query.answer()
-    
-    data = query.data.split(":")
-    action = data[0]
-    file_id = data[1]
-    
-    if file_id == "all":
-        keyword = data[2]
-        results = search_files(keyword)
-        for file_name, file_id in results:
-            await query.message.reply_document(file_id, caption=f"📄 {file_name}")
-    else:
-        # Get the file name from the file_id if needed
-        file_name = "Selected File"  # Replace with the actual file name if needed
-        await query.message.reply_document(file_id, caption=f"📄 {file_name}")
+        await update.message.reply_document(file_id, caption=f"📄 {file_name}")
 
 # set up bot commands
 def setup_handlers(app):
@@ -125,6 +74,4 @@ def setup_handlers(app):
     app.add_handler(CommandHandler("syllabus", list_files))
     app.add_handler(CommandHandler("delete", delete))
     app.add_handler(CommandHandler("search", search))
-    app.add_handler(CallbackQueryHandler(file_selection, pattern="^(books|notes|questions|syllabus):"))
-    app.add_handler(CallbackQueryHandler(search_selection, pattern="^search:"))
     app.add_handler(MessageHandler(filters.Document.ALL, detect_file))
