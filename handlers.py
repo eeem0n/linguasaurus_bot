@@ -24,10 +24,9 @@ async def help_command(update, context):
         with open(pdf_path, "rb") as pdf_file:
             await update.message.reply_document(document=pdf_file, caption=help_text)
             
-    except FileNotFoundError:
-        await update.message.reply_text("❌ Could not find the course catalogue document. Please check the file path.")
     except Exception as e:
-        await update.message.reply_text(f"❌ An error occurred: {str(e)}")
+        await update.message.reply_text(f"❌ Error: {str(e)}")
+        
 # retrieve files by category and course code
 async def list_files(update, context):
     if len(context.args) < 1:
