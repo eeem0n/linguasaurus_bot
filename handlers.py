@@ -21,7 +21,7 @@ async def help_command(update, context):
     )
 
     # send the help message immediately
-    await update.message.reply_text(help_text, parse_mode="HTML")
+    await update.message.reply_text(help_text)
 
     # check if the file exists before sending it
     if os.path.exists(pdf_path):
