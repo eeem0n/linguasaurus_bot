@@ -20,19 +20,12 @@ async def help_command(update, context):
         "/search <keyword>\n"
     )
 
-    # send the help message immediately
-    await update.message.reply_text(help_text)
-
-    # check if the file exists before sending it
-    if os.path.exists(pdf_path):
-        try:
-            with open(pdf_path, "rb") as pdf_file:
-                await update.message.reply_document(
-                    document=pdf_file, 
-                    caption="📄 Course Catalogue"
-                )
-        except Exception as e:
-            print(f"Error sending PDF: {e}") 
+    try:
+        with open(pdf_path, "rb") as pdf_file:
+            await update.message.reply_document(document=pdf_file, caption=help_text)
+            
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {str(e)}")
         
 # retrieve files by category and course code
 async def list_files(update, context):
