@@ -11,18 +11,18 @@ async def help_command(update, context):
     pdf_path = "assets/coursecatalog.pdf"
     help_text = (
         "*Here's the Course Catalogue*\n\n"
-        "*Commands*\n"
-        "/books <course\\_code>\n"
-        "/notes <course\\_code>\n"
-        "/questions <course\\_code>\n"
-        "/syllabus <course\\_code>\n\n"
+        "*use commands in this format:*\n"
+        "/books <course_code>\n"
+        "/notes <course_code>\n"
+        "/questions <course_code>\n"
+        "/syllabus <course_code>\n\n"
         "*Search*\n"
         "/search <keyword>\n"
     )
 
     try:
         with open(pdf_path, "rb") as pdf_file:
-            await update.message.reply_document(document=pdf_file, caption=help_text, parse_mode='Markdown')
+            await update.message.reply_document(document=pdf_file, caption=help_text)
             
     except FileNotFoundError:
         await update.message.reply_text("❌ Could not find the course catalogue document. Please check the file path.")
