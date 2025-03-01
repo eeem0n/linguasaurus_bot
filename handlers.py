@@ -12,10 +12,10 @@ async def help_command(update, context):
     help_text = (
         "here's the course catalogue\n"
         "use commands in this format:\n\n"
+        "/syllabus <course_code>\n"
         "/books <course_code>\n"
         "/notes <course_code>\n"
-        "/questions <course_code>\n"
-        "/syllabus <course_code>\n\n"
+        "/questions <course_code>\n\n"
         
         "/search <keyword>\n"
     )
