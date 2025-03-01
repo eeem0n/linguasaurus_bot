@@ -22,7 +22,7 @@ async def help_command(update, context):
 
     try:
         with open(pdf_path, "rb") as pdf_file:
-            await update.message.reply_document(document=pdf_file, caption=help_text)
+            await update.message.reply_document(caption=help_text, document=pdf_file)
             
     except Exception as e:
         await update.message.reply_text(f"❌ Error: {str(e)}")
