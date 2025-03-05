@@ -17,7 +17,8 @@ async def help_command(update, context):
         "/notes <course_code>\n"
         "/questions <course_code>\n\n"
         
-        "/search <keyword>\n"
+        "/search <keyword>\n\n"
+        "example: /books 1101 \n"
     )
 
     try:
